@@ -9,7 +9,7 @@ namespace GlassBar
     {
         public IntPtr Hwnd { get; set; }
         public string ExePath { get; set; }
-        string _title; ImageSource _icon; bool _active; double _itemWidth = 150;
+        string _title; ImageSource _icon; bool _active; double _itemWidth = 46;
 
         public string Title { get => _title; set { if (_title != value) { _title = value; Raise(nameof(Title)); } } }
         public ImageSource Icon { get => _icon; set { _icon = value; Raise(nameof(Icon)); } }

@@ -14,7 +14,7 @@ namespace GlassBar
 {
     public partial class MainWindow : Window
     {
-        const double BarHeight = 64;
+        const double BarHeight = 68;
 
         readonly ObservableCollection<TaskItem> _tasks = new ObservableCollection<TaskItem>();
         readonly ObservableCollection<PinnedApp> _pinned = new ObservableCollection<PinnedApp>();
@@ -47,6 +47,8 @@ namespace GlassBar
             RunningList.ItemsSource = _tasks;
             _fast.Tick += (s, e) => { RefreshTasks(); if (S.HideNativeTaskbar) NativeTaskbar.Hide(); };
             _slow.Tick += (s, e) => RefreshStats();
+            Pill.SizeChanged += (s, e) => UpdateRegion();
+            SizeChanged += (s, e) => UpdateRegion();
             _previewTimer.Tick += (s, e) => ShowPreviewNow();
             _hideTimer.Tick += (s, e) => { _hideTimer.Stop(); _preview?.HidePreview(); };
         }
@@ -117,13 +119,9 @@ namespace GlassBar
                 abd.rc.Right - abd.rc.Left, abd.rc.Bottom - abd.rc.Top, Native.SWP_NOACTIVATE | Native.SWP_SHOWWINDOW);
             _barTopPx = abd.rc.Top; _barBottomPx = abd.rc.Bottom;
 
-            // Schwebende, abgerundete Glas-Pille: Fenster-Region + passende Rahmen
-            double dpi = VisualTreeHelper.GetDpi(this).DpiScaleX;
-            int inset = (int)(8 * dpi), near = (int)(4 * dpi), far = (int)(6 * dpi);
-            int ww = abd.rc.Right - abd.rc.Left, wh = abd.rc.Bottom - abd.rc.Top;
-            Native.RoundCorners(_hwnd, ww, wh, (int)(22 * dpi), inset, S.Top ? far : near, inset, S.Top ? near : far);
-            var m = S.Top ? new Thickness(8, 6, 8, 4) : new Thickness(8, 4, 8, 6);
-            GlossBg.Margin = m; EdgeLine.Margin = m;
+            // Pille oben/unten mit Abstand zum Rand; Fenster-Region folgt der zentrierten Pille
+            Pill.Margin = S.Top ? new Thickness(0, 7, 0, 5) : new Thickness(0, 5, 0, 7);
+            Dispatcher.BeginInvoke(new Action(UpdateRegion), DispatcherPriority.Render);
         }
 
         IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -227,18 +225,23 @@ namespace GlassBar
                 p.IsRunning = p.Windows.Count > 0;
                 p.IsActive = pinnedActive.Contains(p);
             }
-            UpdateItemWidths();
+            RunningSep.Visibility = _tasks.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        void UpdateItemWidths()
+        void UpdateRegion()
         {
-            if (_tasks.Count == 0) return;
-            double avail = RunningList.ActualWidth - 4;
-            double w = Math.Max(44, Math.Min(170, avail / _tasks.Count - 4));
-            foreach (var t in _tasks) t.ItemWidth = w;
+            if (_hwnd == IntPtr.Zero || Pill.ActualWidth <= 0) return;
+            try
+            {
+                double dpi = VisualTreeHelper.GetDpi(this).DpiScaleX;
+                var tl = Pill.TransformToAncestor(this).Transform(new Point(0, 0));
+                int l = (int)Math.Round(tl.X * dpi), t = (int)Math.Round(tl.Y * dpi);
+                int r = (int)Math.Round((tl.X + Pill.ActualWidth) * dpi), b = (int)Math.Round((tl.Y + Pill.ActualHeight) * dpi);
+                int rad = (int)Math.Round(Pill.CornerRadius.TopLeft * dpi);
+                Native.SetWindowRgn(_hwnd, Native.CreateRoundRectRgn(l, t, r + 1, b + 1, rad * 2, rad * 2), true);
+            }
+            catch { }
         }
-
-        void RunningList_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateItemWidths();
 
         TaskItem ItemOf(object sender) => (TaskItem)((FrameworkElement)sender).DataContext;
 
@@ -355,7 +358,7 @@ namespace GlassBar
         void RefreshStats()
         {
             var now = DateTime.Now;
-            string time = S.Clock24h ? now.ToString("HH:mm:ss") : now.ToString("hh:mm tt");
+            string time = S.Clock24h ? now.ToString("HH:mm") : now.ToString("hh:mm tt");
             ClockText.Text = time + "\n" + now.ToString("dd.MM.yyyy");
 
             if (!S.ShowStats) return;
