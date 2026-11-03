@@ -14,7 +14,7 @@ namespace GlassBar
 {
     public partial class MainWindow : Window
     {
-        const double BarHeight = 56;
+        const double BarHeight = 64;
 
         readonly ObservableCollection<TaskItem> _tasks = new ObservableCollection<TaskItem>();
         readonly ObservableCollection<PinnedApp> _pinned = new ObservableCollection<PinnedApp>();
@@ -28,6 +28,12 @@ namespace GlassBar
         bool _registered;
         Forms.NotifyIcon _tray;
         SettingsWindow _settingsWindow;
+        StatsWindow _stats;
+        PreviewWindow _preview;
+        readonly DispatcherTimer _previewTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(350) };
+        readonly DispatcherTimer _hideTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(150) };
+        IntPtr _previewHwnd; string _previewTitle; FrameworkElement _previewAnchor;
+        int _barTopPx, _barBottomPx;
 
         // CPU-Messung
         ulong _lastIdle, _lastKernel, _lastUser;
@@ -41,6 +47,8 @@ namespace GlassBar
             RunningList.ItemsSource = _tasks;
             _fast.Tick += (s, e) => { RefreshTasks(); if (S.HideNativeTaskbar) NativeTaskbar.Hide(); };
             _slow.Tick += (s, e) => RefreshStats();
+            _previewTimer.Tick += (s, e) => ShowPreviewNow();
+            _hideTimer.Tick += (s, e) => { _hideTimer.Stop(); _preview?.HidePreview(); };
         }
 
         // ---------- Start / Fenster-Setup ----------
@@ -107,7 +115,15 @@ namespace GlassBar
 
             Native.SetWindowPos(_hwnd, Native.HWND_TOPMOST, abd.rc.Left, abd.rc.Top,
                 abd.rc.Right - abd.rc.Left, abd.rc.Bottom - abd.rc.Top, Native.SWP_NOACTIVATE | Native.SWP_SHOWWINDOW);
-            EdgeLine.VerticalAlignment = S.Top ? VerticalAlignment.Bottom : VerticalAlignment.Top;
+            _barTopPx = abd.rc.Top; _barBottomPx = abd.rc.Bottom;
+
+            // Schwebende, abgerundete Glas-Pille: Fenster-Region + passende Rahmen
+            double dpi = VisualTreeHelper.GetDpi(this).DpiScaleX;
+            int inset = (int)(8 * dpi), near = (int)(4 * dpi), far = (int)(6 * dpi);
+            int ww = abd.rc.Right - abd.rc.Left, wh = abd.rc.Bottom - abd.rc.Top;
+            Native.RoundCorners(_hwnd, ww, wh, (int)(22 * dpi), inset, S.Top ? far : near, inset, S.Top ? near : far);
+            var m = S.Top ? new Thickness(8, 6, 8, 4) : new Thickness(8, 4, 8, 6);
+            GlossBg.Margin = m; EdgeLine.Margin = m;
         }
 
         IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -226,7 +242,7 @@ namespace GlassBar
 
         TaskItem ItemOf(object sender) => (TaskItem)((FrameworkElement)sender).DataContext;
 
-        void Task_Click(object sender, RoutedEventArgs e) => WindowTracker.Activate(ItemOf(sender).Hwnd);
+        void Task_Click(object sender, RoutedEventArgs e) { _preview?.HidePreview(); WindowTracker.Activate(ItemOf(sender).Hwnd); }
         void Task_Minimize(object sender, RoutedEventArgs e) => Native.ShowWindow(ItemOf(sender).Hwnd, Native.SW_MINIMIZE);
         void Task_Close(object sender, RoutedEventArgs e) => Native.PostMessage(ItemOf(sender).Hwnd, Native.WM_CLOSE, IntPtr.Zero, IntPtr.Zero);
 
@@ -240,6 +256,7 @@ namespace GlassBar
 
         void Pinned_Click(object sender, RoutedEventArgs e)
         {
+            _preview?.HidePreview();
             var app = (PinnedApp)((FrameworkElement)sender).DataContext;
             if (app.Windows.Count == 0) { Launch(app); return; }
             // Läuft schon: zum Fenster wechseln (bei mehreren Fenstern durchschalten)
@@ -278,6 +295,59 @@ namespace GlassBar
                 S.Pinned.Add(new PinnedApp { Name = System.IO.Path.GetFileNameWithoutExtension(f), Path = f });
             }
             ApplySettings();
+        }
+
+        // ---------- Fenster-Vorschau (DWM-Thumbnail) ----------
+
+        void Task_Enter(object sender, MouseEventArgs e)
+        {
+            var it = ItemOf(sender);
+            SchedulePreview(it.Hwnd, it.Title, (FrameworkElement)sender);
+        }
+
+        void Pinned_Enter(object sender, MouseEventArgs e)
+        {
+            var app = (PinnedApp)((FrameworkElement)sender).DataContext;
+            if (app.Windows.Count == 0) return;
+            IntPtr h = app.Windows[0];
+            SchedulePreview(h, Native.GetTitle(h), (FrameworkElement)sender);
+        }
+
+        void SchedulePreview(IntPtr hwnd, string title, FrameworkElement anchor)
+        {
+            _hideTimer.Stop();
+            _previewHwnd = hwnd; _previewTitle = title; _previewAnchor = anchor;
+            _previewTimer.Stop();
+            if (_preview != null && _preview.IsVisible) ShowPreviewNow(); else _previewTimer.Start();
+        }
+
+        void Preview_Leave(object sender, MouseEventArgs e)
+        {
+            _previewTimer.Stop();
+            _hideTimer.Start();
+        }
+
+        void ShowPreviewNow()
+        {
+            _previewTimer.Stop();
+            if (_previewAnchor == null || !_previewAnchor.IsVisible) return;
+            if (_preview == null) _preview = new PreviewWindow();
+            var p = _previewAnchor.PointToScreen(new Point(_previewAnchor.ActualWidth / 2, 0));
+            _preview.ShowFor(_previewHwnd, _previewTitle, p.X, S.Top ? _barBottomPx : _barTopPx, S.Top);
+        }
+
+        // ---------- Stats-Flyout ----------
+
+        void Stats_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (_stats != null) { _stats.Close(); return; }
+            _preview?.HidePreview();
+            var anchor = StatsPanel.PointToScreen(new Point(StatsPanel.ActualWidth / 2, 0));
+            _stats = new StatsWindow();
+            _stats.Closed += (s, a) => _stats = null;
+            _stats.PositionNear(anchor.X, S.Top ? _barBottomPx : _barTopPx, S.Top);
+            _stats.Show();
+            _stats.Activate();
         }
 
         // ---------- Statusanzeigen ----------
@@ -369,7 +439,8 @@ namespace GlassBar
 
         protected override void OnClosed(EventArgs e)
         {
-            _fast.Stop(); _slow.Stop();
+            _fast.Stop(); _slow.Stop(); _previewTimer.Stop(); _hideTimer.Stop();
+            _preview?.Close(); _stats?.Close();
             if (_registered)
             {
                 var abd = NewAbd();

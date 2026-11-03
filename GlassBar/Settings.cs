@@ -32,7 +32,8 @@ namespace GlassBar
         public bool Clock24h { get; set; } = true;
         public bool Top { get; set; } = false;
         public string Tint { get; set; } = "Blau";
-        public int TintAlpha { get; set; } = 110;
+        public int TintAlpha { get; set; } = 70;
+        public string ApiKey { get; set; } = "";
         public List<PinnedApp> Pinned { get; set; } = new List<PinnedApp>();
 
         public static readonly Dictionary<string, byte[]> Tints = new Dictionary<string, byte[]>

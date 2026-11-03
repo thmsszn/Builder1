@@ -21,6 +21,7 @@ namespace GlassBar
             TintBox.SelectedItem = s.Tint;
             if (TintBox.SelectedIndex < 0) TintBox.SelectedIndex = 0;
             AlphaSlider.Value = s.TintAlpha;
+            KeyBox.Password = s.ApiKey ?? "";
         }
 
         void Apply_Click(object sender, RoutedEventArgs e)
@@ -33,6 +34,7 @@ namespace GlassBar
             s.Top = PosBox.SelectedIndex == 1;
             s.Tint = (string)TintBox.SelectedItem;
             s.TintAlpha = (int)AlphaSlider.Value;
+            s.ApiKey = KeyBox.Password;
             _main.ApplySettings();
         }
 

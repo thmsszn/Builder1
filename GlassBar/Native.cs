@@ -98,6 +98,29 @@ namespace GlassBar
             finally { CloseHandle(p); }
         }
 
+        [StructLayout(LayoutKind.Sequential)] public struct SIZE { public int cx, cy; }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct DWM_THUMBNAIL_PROPERTIES { public uint dwFlags; public RECT rcDestination; public RECT rcSource; public byte opacity; public int fVisible; public int fSourceClientAreaOnly; }
+        [DllImport("dwmapi.dll")] public static extern int DwmRegisterThumbnail(IntPtr dest, IntPtr src, out IntPtr thumb);
+        [DllImport("dwmapi.dll")] public static extern int DwmUnregisterThumbnail(IntPtr thumb);
+        [DllImport("dwmapi.dll")] public static extern int DwmUpdateThumbnailProperties(IntPtr thumb, ref DWM_THUMBNAIL_PROPERTIES p);
+        [DllImport("dwmapi.dll")] public static extern int DwmQueryThumbnailSourceSize(IntPtr thumb, out SIZE size);
+        [DllImport("gdi32.dll")] public static extern IntPtr CreateRoundRectRgn(int l, int t, int r, int b, int w, int h);
+        [DllImport("user32.dll")] public static extern int SetWindowRgn(IntPtr h, IntPtr rgn, bool redraw);
+
+        public static void RoundCorners(IntPtr hwnd, int w, int h, int radius, int l = 0, int t = 0, int r = 0, int b = 0)
+        {
+            SetWindowRgn(hwnd, CreateRoundRectRgn(l, t, w - r + 1, h - b + 1, radius * 2, radius * 2), true);
+        }
+
+        public static void MakeToolWindow(IntPtr hwnd, bool noActivate, bool clickThrough)
+        {
+            long ex = GetWindowLongPtr(hwnd, GWL_EXSTYLE).ToInt64() | WS_EX_TOOLWINDOW;
+            if (noActivate) ex |= WS_EX_NOACTIVATE;
+            if (clickThrough) ex |= 0x20; // WS_EX_TRANSPARENT
+            SetWindowLongPtr(hwnd, GWL_EXSTYLE, (IntPtr)ex);
+        }
+
         public const int ABN_FULLSCREENAPP = 2;
         public static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
         public const uint SWP_NOMOVE = 0x2, SWP_NOSIZE = 0x1;

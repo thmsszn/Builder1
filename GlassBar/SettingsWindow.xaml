@@ -25,6 +25,11 @@
         <TextBlock Text="Farbintensität" Margin="0,12,0,4"/>
         <Slider x:Name="AlphaSlider" Minimum="0" Maximum="230"/>
 
+        <TextBlock Text="Anthropic-API-Key für die KI-Analyse (optional)" Margin="0,12,0,4"/>
+        <PasswordBox x:Name="KeyBox"/>
+        <TextBlock Opacity="0.5" FontSize="10" TextWrapping="Wrap" Margin="0,3,0,0"
+                   Text="Wird im Klartext in settings.json gespeichert (oder Umgebungsvariable ANTHROPIC_API_KEY nutzen). Beim Klick auf „KI-Analyse“ werden Systemwerte und Prozessnamen an die Anthropic-API gesendet."/>
+
         <TextBlock Margin="0,14,0,0" Opacity="0.55" TextWrapping="Wrap" FontSize="11"
                    Text="Tipp: Dateien (.exe, Verknüpfungen) per Drag &amp; Drop auf die Leiste ziehen, um sie anzuheften. Rechtsklick auf ein Symbol zum Lösen."/>
 

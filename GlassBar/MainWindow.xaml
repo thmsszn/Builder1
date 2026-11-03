@@ -1,26 +1,34 @@
 <Window x:Class="GlassBar.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="GlassBar" Height="56" Width="1200"
+        Title="GlassBar" Height="64" Width="1200"
         WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False" ShowActivated="False"
         Topmost="True" Background="Transparent" AllowDrop="True"
         FontFamily="Segoe UI" Foreground="White" UseLayoutRounding="True"
         SourceInitialized="Window_SourceInitialized" Loaded="Window_Loaded" Drop="Window_Drop">
     <Grid>
         <!-- Glas-Glanz: heller oberer Bereich, dunklerer unterer Bereich -->
-        <Border IsHitTestVisible="False">
+        <Border x:Name="GlossBg" IsHitTestVisible="False" Margin="8,4,8,6" CornerRadius="22">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#48FFFFFF" Offset="0"/>
-                    <GradientStop Color="#16FFFFFF" Offset="0.5"/>
-                    <GradientStop Color="#06000000" Offset="0.5"/>
-                    <GradientStop Color="#30000000" Offset="1"/>
+                    <GradientStop Color="#40FFFFFF" Offset="0"/>
+                    <GradientStop Color="#10FFFFFF" Offset="0.5"/>
+                    <GradientStop Color="#04000000" Offset="0.5"/>
+                    <GradientStop Color="#26000000" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
-        <Border x:Name="EdgeLine" IsHitTestVisible="False" VerticalAlignment="Top" Height="1" Background="#99FFFFFF"/>
+        <Border x:Name="EdgeLine" IsHitTestVisible="False" Margin="8,4,8,6" CornerRadius="22" BorderThickness="1">
+            <Border.BorderBrush>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#B0FFFFFF" Offset="0"/>
+                    <GradientStop Color="#30FFFFFF" Offset="0.6"/>
+                    <GradientStop Color="#18FFFFFF" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.BorderBrush>
+        </Border>
 
-        <DockPanel Margin="8,6">
+        <DockPanel Margin="22,10">
             <!-- Rechte Seite -->
             <Button DockPanel.Dock="Right" x:Name="ClockButton" Style="{StaticResource GlossButton}" Width="86" Click="Clock_Click" ToolTip="Benachrichtigungen">
                 <TextBlock x:Name="ClockText" TextAlignment="Center" FontSize="13" FontWeight="SemiBold"/>
@@ -36,7 +44,7 @@
                 <Button Style="{StaticResource GlossButton}" Width="28" Click="VolMute_Click" ToolTip="Stumm"><TextBlock Text="🔇" HorizontalAlignment="Center"/></Button>
                 <Button Style="{StaticResource GlossButton}" Width="28" Click="VolUp_Click" ToolTip="Lauter"><TextBlock Text="🔊" HorizontalAlignment="Center"/></Button>
             </StackPanel>
-            <Border DockPanel.Dock="Right" x:Name="StatsPanel" Margin="2,0" Padding="10,0" CornerRadius="10" BorderThickness="1" BorderBrush="#30FFFFFF" Background="#18000000">
+            <Border DockPanel.Dock="Right" x:Name="StatsPanel" Margin="2,0" Padding="10,0" CornerRadius="10" BorderThickness="1" BorderBrush="#30FFFFFF" Background="#18000000" Cursor="Hand" MouseLeftButtonUp="Stats_Click" ToolTip="System-Details &amp; KI-Analyse">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock x:Name="CpuText" FontSize="12" Margin="0,0,10,0" ToolTip="CPU-Auslastung"/>
                     <TextBlock x:Name="RamText" FontSize="12" Margin="0,0,10,0" ToolTip="RAM-Auslastung"/>
@@ -67,7 +75,7 @@
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Style="{StaticResource GlossButton}" Width="40" ToolTip="{Binding Name}" Click="Pinned_Click" PreviewMouseDown="Pinned_MouseDown">
+                        <Button Style="{StaticResource GlossButton}" Width="40" ToolTip="{Binding Name}" Click="Pinned_Click" PreviewMouseDown="Pinned_MouseDown" MouseEnter="Pinned_Enter" MouseLeave="Preview_Leave">
                             <Button.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Von Leiste lösen" Click="Unpin_Click"/>
@@ -115,7 +123,7 @@
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Style="{StaticResource GlossButton}" Width="{Binding ItemWidth}" ToolTip="{Binding Title}" Click="Task_Click" PreviewMouseDown="Task_MouseDown">
+                        <Button Style="{StaticResource GlossButton}" Width="{Binding ItemWidth}" ToolTip="{Binding Title}" Click="Task_Click" PreviewMouseDown="Task_MouseDown" MouseEnter="Task_Enter" MouseLeave="Preview_Leave">
                             <Button.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Minimieren" Click="Task_Minimize"/>
