@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -38,13 +37,8 @@ namespace GlassBar
             if (h == IntPtr.Zero) h = Native.GetClassLongPtr(hwnd, -14); // GCL_HICON
             var src = h != IntPtr.Zero ? FromHIcon(h) : null;
             if (src != null) return src;
-            try
-            {
-                Native.GetWindowThreadProcessId(hwnd, out uint pid);
-                using (var p = Process.GetProcessById((int)pid))
-                    return FromPath(p.MainModule.FileName);
-            }
-            catch { return null; }
+            var path = Native.GetExePath(hwnd);
+            return path == null ? null : FromPath(path);
         }
     }
 }

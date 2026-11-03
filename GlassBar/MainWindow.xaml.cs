@@ -23,7 +23,8 @@ namespace GlassBar
         readonly DispatcherTimer _slow = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
 
         IntPtr _hwnd;
-        uint _callbackMsg;
+        uint _callbackMsg, _taskbarCreatedMsg;
+        int _tick;
         bool _registered;
         Forms.NotifyIcon _tray;
         SettingsWindow _settingsWindow;
@@ -84,6 +85,7 @@ namespace GlassBar
         {
             var abd = NewAbd();
             _callbackMsg = Native.RegisterWindowMessage("GlassBarAppBarCallback");
+            _taskbarCreatedMsg = Native.RegisterWindowMessage("TaskbarCreated");
             abd.uCallbackMessage = _callbackMsg;
             Native.SHAppBarMessage(Native.ABM_NEW, ref abd);
             _registered = true;
@@ -110,8 +112,30 @@ namespace GlassBar
 
         IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (_callbackMsg != 0 && (uint)msg == _callbackMsg && wParam.ToInt32() == Native.ABN_POSCHANGED)
-                PositionBar();
+            if (_callbackMsg != 0 && (uint)msg == _callbackMsg)
+            {
+                int n = wParam.ToInt32();
+                if (n == Native.ABN_POSCHANGED) PositionBar();
+                else if (n == Native.ABN_FULLSCREENAPP)
+                {
+                    // Vollbild-App (Spiel/Video): Leiste in den Hintergrund, danach wieder nach vorn
+                    Native.SetWindowPos(_hwnd, lParam != IntPtr.Zero ? Native.HWND_BOTTOM : Native.HWND_TOPMOST,
+                        0, 0, 0, 0, Native.SWP_NOMOVE | Native.SWP_NOSIZE | Native.SWP_NOACTIVATE);
+                }
+            }
+            else if (_taskbarCreatedMsg != 0 && (uint)msg == _taskbarCreatedMsg)
+            {
+                // Explorer wurde neu gestartet: AppBar neu anmelden und Taskleiste erneut ausblenden
+                NativeTaskbar.ForgetState();
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    var abd = NewAbd();
+                    abd.uCallbackMessage = _callbackMsg;
+                    Native.SHAppBarMessage(Native.ABM_NEW, ref abd);
+                    PositionBar();
+                    if (S.HideNativeTaskbar) NativeTaskbar.Hide();
+                }));
+            }
             else if (msg == 0x007E || msg == 0x02E0) // WM_DISPLAYCHANGE / WM_DPICHANGED
                 Dispatcher.BeginInvoke(new Action(PositionBar));
             return IntPtr.Zero;
@@ -135,13 +159,18 @@ namespace GlassBar
             AutoStart.Set(S.AutoStart);
             PositionBar();
             RefreshStats();
+            RefreshTasks();
             S.Save();
         }
 
         // ---------- Fensterliste ----------
 
+        PinnedApp FindPinned(string exe) =>
+            exe == null ? null : _pinned.FirstOrDefault(p => string.Equals(p.Path, exe, StringComparison.OrdinalIgnoreCase));
+
         void RefreshTasks()
         {
+            _tick++;
             var windows = WindowTracker.GetTaskWindows(_hwnd);
             var set = new HashSet<IntPtr>(windows);
             IntPtr active = Native.GetAncestor(Native.GetForegroundWindow(), 3);
@@ -151,16 +180,36 @@ namespace GlassBar
                 _tasks.Remove(_byHwnd[gone]);
                 _byHwnd.Remove(gone);
             }
+
+            foreach (var p in _pinned) p.Windows.Clear();
+            var pinnedActive = new HashSet<PinnedApp>();
+
             foreach (var h in windows)
             {
                 if (!_byHwnd.TryGetValue(h, out var item))
                 {
-                    item = new TaskItem { Hwnd = h, Icon = IconHelper.ForWindow(h) };
+                    item = new TaskItem { Hwnd = h, ExePath = Native.GetExePath(h) };
                     _byHwnd[h] = item;
-                    _tasks.Add(item);
                 }
+                if (item.Icon == null && (_tick % 10 == 0 || !_tasks.Contains(item))) item.Icon = IconHelper.ForWindow(h);
                 item.Title = Native.GetTitle(h);
                 item.IsActive = h == active && !Native.IsIconic(h);
+
+                var pin = FindPinned(item.ExePath);
+                if (pin != null)
+                {
+                    // Fenster einer angehefteten App werden dort gebündelt statt doppelt angezeigt
+                    pin.Windows.Add(h);
+                    if (item.IsActive) pinnedActive.Add(pin);
+                    _tasks.Remove(item);
+                }
+                else if (!_tasks.Contains(item)) _tasks.Add(item);
+            }
+
+            foreach (var p in _pinned)
+            {
+                p.IsRunning = p.Windows.Count > 0;
+                p.IsActive = pinnedActive.Contains(p);
             }
             UpdateItemWidths();
         }
@@ -183,11 +232,34 @@ namespace GlassBar
 
         // ---------- Angeheftete Apps ----------
 
+        static void Launch(PinnedApp app)
+        {
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(app.Path) { UseShellExecute = true }); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "GlassBar"); }
+        }
+
         void Pinned_Click(object sender, RoutedEventArgs e)
         {
             var app = (PinnedApp)((FrameworkElement)sender).DataContext;
-            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(app.Path) { UseShellExecute = true }); }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "GlassBar"); }
+            if (app.Windows.Count == 0) { Launch(app); return; }
+            // Läuft schon: zum Fenster wechseln (bei mehreren Fenstern durchschalten)
+            IntPtr fg = Native.GetAncestor(Native.GetForegroundWindow(), 3);
+            int idx = app.Windows.IndexOf(fg);
+            WindowTracker.Activate(app.Windows.Count == 1 ? app.Windows[0] : app.Windows[(idx + 1) % app.Windows.Count]);
+        }
+
+        void Pinned_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton != MouseButton.Middle) return;
+            Launch((PinnedApp)((FrameworkElement)sender).DataContext); // Mittelklick = neue Instanz
+            e.Handled = true;
+        }
+
+        void Task_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton != MouseButton.Middle) return;
+            Native.PostMessage(ItemOf(sender).Hwnd, Native.WM_CLOSE, IntPtr.Zero, IntPtr.Zero); // Mittelklick = schließen
+            e.Handled = true;
         }
 
         void Unpin_Click(object sender, RoutedEventArgs e)

@@ -8,6 +8,7 @@ namespace GlassBar
     public class TaskItem : INotifyPropertyChanged
     {
         public IntPtr Hwnd { get; set; }
+        public string ExePath { get; set; }
         string _title; ImageSource _icon; bool _active; double _itemWidth = 150;
 
         public string Title { get => _title; set { if (_title != value) { _title = value; Raise(nameof(Title)); } } }

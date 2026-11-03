@@ -53,5 +53,6 @@ namespace GlassBar
         }
 
         public static bool IsHidden => _hidden;
+        public static void ForgetState() { _hidden = false; }
     }
 }

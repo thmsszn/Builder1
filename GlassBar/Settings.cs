@@ -8,8 +8,15 @@ using System.Windows.Media.Imaging;
 
 namespace GlassBar
 {
-    public class PinnedApp
+    public class PinnedApp : System.ComponentModel.INotifyPropertyChanged
     {
+        bool _running, _active;
+        [JsonIgnore] public List<IntPtr> Windows { get; } = new List<IntPtr>();
+        [JsonIgnore] public bool IsRunning { get => _running; set { if (_running != value) { _running = value; Raise(nameof(IsRunning)); } } }
+        [JsonIgnore] public bool IsActive { get => _active; set { if (_active != value) { _active = value; Raise(nameof(IsActive)); } } }
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        void Raise(string n) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(n));
+
         public string Name { get; set; }
         public string Path { get; set; }
 

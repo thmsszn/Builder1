@@ -67,13 +67,43 @@
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Style="{StaticResource GlossButton}" Width="40" ToolTip="{Binding Name}" Click="Pinned_Click">
+                        <Button Style="{StaticResource GlossButton}" Width="40" ToolTip="{Binding Name}" Click="Pinned_Click" PreviewMouseDown="Pinned_MouseDown">
                             <Button.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Von Leiste lösen" Click="Unpin_Click"/>
                                 </ContextMenu>
                             </Button.ContextMenu>
-                            <Image Source="{Binding Icon}" Width="24" Height="24" HorizontalAlignment="Center"/>
+                            <Grid>
+                                <Border CornerRadius="10" Margin="-6,0">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                    <Setter Property="Background" Value="#38BFE4FF"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                </Border>
+                                <Image Source="{Binding Icon}" Width="24" Height="24" HorizontalAlignment="Center"/>
+                                <Border VerticalAlignment="Bottom" HorizontalAlignment="Center" Height="3" Margin="0,0,0,-5" CornerRadius="2" Background="{StaticResource Accent}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Setter Property="Width" Value="6"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsRunning}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                    <Setter Property="Width" Value="18"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                </Border>
+                            </Grid>
                         </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -85,7 +115,7 @@
                 <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Style="{StaticResource GlossButton}" Width="{Binding ItemWidth}" ToolTip="{Binding Title}" Click="Task_Click">
+                        <Button Style="{StaticResource GlossButton}" Width="{Binding ItemWidth}" ToolTip="{Binding Title}" Click="Task_Click" PreviewMouseDown="Task_MouseDown">
                             <Button.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Minimieren" Click="Task_Minimize"/>

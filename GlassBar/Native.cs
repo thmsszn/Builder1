@@ -80,6 +80,28 @@ namespace GlassBar
         [DllImport("kernel32.dll")] public static extern bool GetSystemTimes(out FILETIME idle, out FILETIME kernel, out FILETIME user);
         [DllImport("kernel32.dll")] public static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX m);
 
+        [DllImport("kernel32.dll")] public static extern IntPtr OpenProcess(uint access, bool inherit, uint pid);
+        [DllImport("kernel32.dll")] public static extern bool CloseHandle(IntPtr h);
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] public static extern bool QueryFullProcessImageName(IntPtr h, int flags, StringBuilder sb, ref int size);
+
+        public static string GetExePath(IntPtr hwnd)
+        {
+            GetWindowThreadProcessId(hwnd, out uint pid);
+            IntPtr p = OpenProcess(0x1000, false, pid); // PROCESS_QUERY_LIMITED_INFORMATION
+            if (p == IntPtr.Zero) return null;
+            try
+            {
+                var sb = new StringBuilder(1024);
+                int n = sb.Capacity;
+                return QueryFullProcessImageName(p, 0, sb, ref n) ? sb.ToString() : null;
+            }
+            finally { CloseHandle(p); }
+        }
+
+        public const int ABN_FULLSCREENAPP = 2;
+        public static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
+        public const uint SWP_NOMOVE = 0x2, SWP_NOSIZE = 0x1;
+
         public static string GetTitle(IntPtr h)
         {
             int len = GetWindowTextLength(h);
