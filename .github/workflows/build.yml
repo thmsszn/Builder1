@@ -1,7 +1,11 @@
 name: Build GlassBar
 on:
   push:
+    branches: [master]
+    tags: ['v*']
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   build:
     runs-on: windows-latest
@@ -15,3 +19,9 @@ jobs:
         with:
           name: GlassBar-win-x64
           path: publish/GlassBar.exe
+      - name: Release (bei Tag v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: publish/GlassBar.exe
+          generate_release_notes: true
