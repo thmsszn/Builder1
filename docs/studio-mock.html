@@ -1,0 +1,70 @@
+<!doctype html><meta charset="utf-8"><style>
+*{box-sizing:border-box}body{margin:0;width:1200px;height:800px;font-family:"Segoe UI",Inter,Arial,sans-serif;color:#f3f6ff;background:#090c15;position:relative;overflow:hidden}
+.bl{position:absolute;border-radius:50%}
+.card{background:linear-gradient(#ffffff1e,#ffffff0a);border:1px solid #ffffff26;border-radius:20px}
+.title{height:52px;display:flex;align-items:center;padding:0 20px;gap:10px;font-weight:600;font-size:13.5px;position:relative}
+.logo{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#8b7cff,#3fb0ff)}
+.ver{background:#ffffff26;border-radius:6px;padding:1px 6px;font-size:10px;color:#9aa6c4;font-weight:700}
+.nav{position:absolute;left:14px;top:58px;width:216px}
+.ni{display:flex;align-items:center;gap:13px;padding:10px 18px;border-radius:12px;color:#b3bdd6;font-size:13.5px;font-weight:500;margin:2px 0;position:relative}
+.ni i{width:16px;height:16px;border-radius:5px;background:currentColor;opacity:.8}
+.ni.on{color:#fff;background:linear-gradient(#ffffff1e,#ffffff0a);border:1px solid #ffffff26;padding:9px 17px}
+.ni.on:before{content:"";position:absolute;left:4px;top:50%;margin-top:-9px;width:3px;height:18px;border-radius:2px;background:linear-gradient(135deg,#8b7cff,#3fb0ff)}
+.os{position:absolute;left:14px;bottom:16px;width:216px;padding:12px 14px;border-radius:16px;font-size:12px;font-weight:600}
+.os small{display:block;color:#6f7b99;font-weight:400;margin-top:3px;font-size:11.5px}
+.main{position:absolute;left:244px;top:58px;right:24px;bottom:16px}
+.prev{height:212px;border-radius:20px;position:relative;overflow:hidden;
+ background:radial-gradient(circle at 15% 35%,#5b7cffcc,transparent 45%),radial-gradient(circle at 85% 25%,#c026d3aa,transparent 40%),radial-gradient(circle at 55% 100%,#06b6d4aa,transparent 50%),linear-gradient(135deg,#0b102a,#1b0f3a)}
+.win{position:absolute;left:50%;margin-left:-190px;top:60px;width:380px;height:150px;border-radius:14px;background:linear-gradient(35deg,#ffb06b,#e04f9b)}
+.win:before{content:"";position:absolute;left:0;right:0;top:0;height:22px;border-radius:14px 14px 0 0;background:#ffffff46}
+.tag{position:absolute;left:16px;top:14px;font-size:10px;font-weight:600;color:#ffffffb0;letter-spacing:.3px}
+.pill{position:absolute;bottom:7px;height:34px;border-radius:17px;border:1px solid #ffffffa0;
+ background:linear-gradient(#ffffff55,#ffffff14 48%,#00000008 52%,#00000040),rgba(10,18,38,.42);backdrop-filter:blur(18px) saturate(1.4);
+ box-shadow:0 6px 18px #0007,inset 0 1px 0 #ffffff66,inset 0 0 0 1px #ffffff14;display:flex;align-items:center;gap:8px;padding:0 14px}
+.ic{width:20px;height:20px;border-radius:6px}.run:after{content:"";display:block;width:11px;height:2.5px;border-radius:2px;background:#8bb6ff;margin:3px auto -5px}
+.ic.s{display:grid;grid-template-columns:1fr 1fr;gap:1.5px;background:none}.ic.s b{background:#6cb8ff;border-radius:1.5px}
+.row{display:flex;gap:14px;margin-top:14px}
+.act{flex:1;padding:16px 22px}.cap{font-size:11px;color:#6f7b99;font-weight:700;letter-spacing:.4px}
+.big{font-size:26px;font-weight:600;margin:4px 0 2px}
+.tg{width:46px;height:26px;border-radius:13px;background:linear-gradient(135deg,#8b7cff,#3fb0ff);position:relative;border:1px solid #ffffff55}
+.tg:after{content:"";position:absolute;right:4px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 5px #0006}
+h3{font-size:15px;margin:16px 2px 10px}
+.pc{width:196px;padding:10px 10px 12px;margin-right:14px;display:inline-block;vertical-align:top}
+.mini{height:74px;border-radius:12px;position:relative;overflow:hidden;background:radial-gradient(circle at 20% 40%,#5b7cffcc,transparent 50%),radial-gradient(circle at 80% 30%,#c026d3aa,transparent 45%),#141a3a}
+.mp{position:absolute;bottom:5px;height:12px;border-radius:7px;border:1px solid #fff9;background:linear-gradient(#ffffff55,#00000030)}
+.pc b{display:block;margin:10px 4px 0;font-size:14px}.pc small{display:block;margin:2px 4px 0;font-size:11px;color:#6f7b99;height:28px}
+.pc.act2{border-color:#8b7cff}
+.foot{position:absolute;left:0;right:0;bottom:0;height:56px;border-radius:18px;display:flex;align-items:center;padding:0 18px;gap:10px;font-size:13px}
+.btn{padding:9px 18px;border-radius:12px;border:1px solid #ffffff26;background:linear-gradient(#ffffff1e,#ffffff0a);font-weight:600;font-size:13px}
+.acc{background:linear-gradient(135deg,#8b7cff,#3fb0ff);border-color:#ffffff66;padding:9px 30px;box-shadow:0 0 18px #6d8cff88;color:#fff}
+.dot{width:9px;height:9px;border-radius:50%;background:#34d399}
+.mock{position:absolute;right:30px;top:14px;font-size:11px;color:#9aa6c4}
+</style>
+<div class="bl" style="width:760px;height:760px;left:-200px;top:-260px;background:radial-gradient(#5b5bff66,#5b5bff00 70%)"></div>
+<div class="bl" style="width:700px;height:700px;right:-180px;top:-200px;background:radial-gradient(#c026d355,#c026d300 70%)"></div>
+<div class="bl" style="width:900px;height:900px;left:300px;bottom:-520px;background:radial-gradient(#06b6d444,#06b6d400 70%)"></div>
+<div class="title"><div class="logo"></div>Glass Taskbar Studio<span class="ver">2.0</span></div>
+<div class="nav">
+ <div class="ni on"><i></i>Dashboard</div><div class="ni"><i></i>Appearance</div><div class="ni"><i></i>Transparency &amp; Blur</div>
+ <div class="ni"><i></i>Colors</div><div class="ni"><i></i>Position &amp; Layout</div><div class="ni"><i></i>Animations</div>
+ <div class="ni"><i></i>Presets</div><div class="ni"><i></i>Advanced</div></div>
+<div class="os card">Windows 11 (build 22631)<small>Effects run while this app is in the tray.</small></div>
+<div class="main">
+ <div class="prev card"><div class="tag">LIVE PREVIEW · simulated backdrop, real geometry</div><div class="win"></div>
+  <div class="pill" style="left:300px;width:560px"><div class="ic s"><b></b><b></b><b></b><b></b></div><div class="ic" style="background:#f5b942"></div><div class="ic run" style="background:#4ade80"></div><div class="ic" style="background:#60a5fa"></div><div class="ic" style="background:#f472b6"></div><div class="ic" style="background:#a78bfa"></div></div>
+  <div class="pill" style="right:14px;width:190px;justify-content:flex-end;font-size:10.5px;font-weight:600;gap:10px">• • • <span style="text-align:right;line-height:1.15">14:32<br>04.11.2026</span></div>
+ </div>
+ <div class="row">
+  <div class="card act"><div class="cap">ACTIVE THEME</div><div class="big">Liquid Glass</div></div>
+  <div class="card act" style="display:flex;justify-content:space-between"><div><div class="cap">TASKBAR EFFECTS</div><div style="margin-top:8px;font-size:13px">Active on 1 taskbar - Acrylic, compact (auto-fit)</div></div><div class="tg"></div></div>
+ </div>
+ <h3>Presets</h3>
+ <div style="white-space:nowrap">
+  <div class="pc card act2"><div class="mini"><div class="mp" style="left:34px;right:70px;background:linear-gradient(#ffffff66,#0a123840)"></div><div class="mp" style="right:8px;width:50px"></div></div><b>Liquid Glass</b><small>Glossy, translucent, floating</small></div>
+  <div class="pc card"><div class="mini"><div class="mp" style="left:3px;right:3px;bottom:0;border-radius:0;background:linear-gradient(#ffffff30,#00000050)"></div></div><b>Windows 11 Pro</b><small>Clean, flush and minimal</small></div>
+  <div class="pc card"><div class="mini"><div class="mp" style="left:40px;right:70px;background:linear-gradient(#ffffff30,#000000a0)"></div><div class="mp" style="right:8px;width:50px;background:linear-gradient(#ffffff30,#000000a0)"></div></div><b>Midnight</b><small>Deep dark glass</small></div>
+  <div class="pc card"><div class="mini"><div class="mp" style="left:34px;right:70px;background:linear-gradient(#ffffff80,#8fb4d960)"></div><div class="mp" style="right:8px;width:50px;background:linear-gradient(#ffffff80,#8fb4d960)"></div></div><b>Frosted Glass</b><small>Soft blue frost</small></div>
+ </div>
+ <div class="foot card"><div class="dot"></div><span style="color:#9aa6c4">All changes applied</span><span style="flex:1"></span>
+  <div class="btn">Reset to default</div><div class="btn">Restore Windows taskbar</div><div class="btn acc">Apply</div></div>
+</div>
