@@ -24,6 +24,14 @@ namespace GlassTaskbarStudio
             // Emergency path: remove every effect and restore registry values, then quit.
             if (e.Args.Contains("--reset"))
             {
+                // stop a running instance first, otherwise it would re-apply the effects a second later
+                int self = System.Diagnostics.Process.GetCurrentProcess().Id;
+                foreach (var proc in System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName))
+                {
+                    if (proc.Id == self) continue;
+                    try { proc.Kill(); proc.WaitForExit(2000); } catch { }
+                    proc.Dispose();
+                }
                 TaskbarEngine.HardRestoreAll();
                 var cfg = AppConfig.Load();
                 SystemTweaks.RestoreExplorerOptions(cfg);
@@ -67,6 +75,7 @@ namespace GlassTaskbarStudio
 
             bool silent = e.Args.Contains("--tray") && config.FirstRunDone;
             if (!silent) ShowWindow();
+            if (!config.FirstRunDone) { config.FirstRunDone = true; config.Save(); } // later autostarts stay in the tray
         }
 
         void ShowWindow()
