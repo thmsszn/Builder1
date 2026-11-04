@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:GlassTaskbarStudio.UI.Controls">
+    <DataTemplate x:Key="PresetCard">
+        <Button Width="262" Margin="0,0,14,14" Cursor="Hand" FocusVisualStyle="{x:Null}"
+                Command="{Binding DataContext.SelectPresetCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                CommandParameter="{Binding}">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="card" CornerRadius="20" BorderThickness="1" BorderBrush="{DynamicResource GlassStroke}" Background="{DynamicResource GlassFill}" Padding="10,10,10,14">
+                        <StackPanel>
+                            <c:TaskbarPreview Settings="{Binding Settings}" IsMini="True" Height="92"/>
+                            <Grid Margin="6,12,6,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" Style="{DynamicResource H2}"/>
+                                <Border x:Name="chip" Grid.Column="1" Visibility="Collapsed" CornerRadius="7" Padding="7,1,7,2" Background="{DynamicResource AccentBrush}">
+                                    <TextBlock Text="ACTIVE" FontSize="9.5" FontWeight="Bold" Foreground="White"/>
+                                </Border>
+                            </Grid>
+                            <TextBlock Text="{Binding Tagline}" Style="{DynamicResource Caption}" TextWrapping="Wrap" Margin="6,3,6,0" MinHeight="30"/>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="card" Property="Background" Value="#26FFFFFF"/></Trigger>
+                        <DataTrigger Binding="{Binding IsActive}" Value="True">
+                            <Setter TargetName="card" Property="BorderBrush" Value="#FF8B7CFF"/>
+                            <Setter TargetName="chip" Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </DataTemplate>
+</ResourceDictionary>

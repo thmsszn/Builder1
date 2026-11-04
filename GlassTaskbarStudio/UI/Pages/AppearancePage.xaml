@@ -1,0 +1,42 @@
+<UserControl x:Class="GlassTaskbarStudio.UI.Pages.AppearancePage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:GlassTaskbarStudio.UI.Controls">
+    <StackPanel>
+        <TextBlock Text="Appearance" Style="{StaticResource H1}" Margin="0,0,0,4"/>
+        <TextBlock Text="Shape, shine and depth of the glass." Style="{StaticResource Body}" Margin="0,0,0,16"/>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <c:SettingRow Title="Glossy / Liquid Glass intensity" Badge="OVERLAY" Description="Specular sheen on the upper half and a soft darker rim below. Drawn by a click-through overlay because Windows cannot render gloss itself.">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.GlossIntensity, Mode=TwoWay}" Tag="%"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Corner radius" Badge="REGION" Description="Rounds the real taskbar window by clipping it. Clamped so icons are never cut off.">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.CornerRadius, Mode=TwoWay}" Maximum="36" Tag="px"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Taskbar height" Badge="REGISTRY" Description="Small / Medium / Large - the sizes Windows 11 offers. Takes effect after an Explorer restart."
+                              IsEnabled="{Binding SupportsSizeTweak}" Note="Windows 11 only. Windows 10 has no per-user size setting besides small icons.">
+                    <Border CornerRadius="12" Background="#14FFFFFF" Padding="3" BorderThickness="1" BorderBrush="#18FFFFFF">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Style="{StaticResource Segment}" Content="Small" IsChecked="{Binding Draft.Height, Converter={StaticResource EnumMatch}, ConverterParameter=Small}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="Medium" IsChecked="{Binding Draft.Height, Converter={StaticResource EnumMatch}, ConverterParameter=Medium}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="Large" IsChecked="{Binding Draft.Height, Converter={StaticResource EnumMatch}, ConverterParameter=Large}"/>
+                        </StackPanel>
+                    </Border>
+                </c:SettingRow>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Text="Edges and depth" Style="{StaticResource H2}" Margin="0,0,0,2"/>
+                <c:SettingRow Title="Border / highlight strength" Badge="OVERLAY" Description="The bright rim along the glass edge, brightest on top.">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.BorderOpacity, Mode=TwoWay}" Tag="%"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Border thickness" Badge="OVERLAY">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.BorderThickness, Mode=TwoWay}" Maximum="3" Tag="px"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Shadow intensity" Badge="OVERLAY" Description="Soft shadow (or glow, depending on its color) around the floating glass.">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.ShadowIntensity, Mode=TwoWay}" Tag="%"/>
+                </c:SettingRow>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,62 @@
+<UserControl x:Class="GlassTaskbarStudio.UI.Pages.LayoutPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:GlassTaskbarStudio.UI.Controls">
+    <StackPanel>
+        <TextBlock Text="Position and Layout" Style="{StaticResource H1}" Margin="0,0,0,4"/>
+        <TextBlock Text="Where the icons sit and how the glass wraps around them." Style="{StaticResource Body}" Margin="0,0,0,16"/>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <c:SettingRow Title="Icon alignment" Badge="REGISTRY" Description="Centered (Windows 11 default) or left. Applied live through the Explorer setting."
+                              IsEnabled="{Binding SupportsAlignment}" Note="Windows 11 only - Windows 10 cannot center its taskbar icons without replacing the taskbar.">
+                    <Border CornerRadius="12" Background="#14FFFFFF" Padding="3" BorderThickness="1" BorderBrush="#18FFFFFF">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Style="{StaticResource Segment}" Content="Left" IsChecked="{Binding Draft.Alignment, Converter={StaticResource EnumMatch}, ConverterParameter=Left}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="Center" IsChecked="{Binding Draft.Alignment, Converter={StaticResource EnumMatch}, ConverterParameter=Center}"/>
+                        </StackPanel>
+                    </Border>
+                </c:SettingRow>
+                <c:SettingRow Title="Taskbar position on screen" Badge="APP" Description="Windows 11 only supports the bottom edge. Left, right and top docking were removed by Microsoft and cannot be restored without replacing the taskbar." IsEnabled="False" Note="Not available on Windows 11.">
+                    <TextBlock Text="Bottom" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold"/>
+                </c:SettingRow>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Text="Floating" Style="{StaticResource H2}" Margin="0,0,0,2"/>
+                <c:SettingRow Title="Floating taskbar" Badge="REGION" Description="Detaches the glass from the screen edges.">
+                    <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding Draft.Floating, Mode=TwoWay}"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Vertical gap" Badge="REGION" Description="Space above and below the glass (limited so icons stay fully visible).">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.FloatingGap, Mode=TwoWay}" Maximum="12" Tag="px"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Side gap" Badge="REGION" Description="Space left and right of the glass.">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.SideGap, Mode=TwoWay}" Maximum="80" Tag="px"/>
+                </c:SettingRow>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Text="Compact (island) mode" Style="{StaticResource H2}" Margin="0,0,0,2"/>
+                <c:SettingRow Title="Compact taskbar" Badge="REGION" Description="Shrinks the glass to a pill around your app icons plus a second pill for the system tray, like a dock."
+                              IsEnabled="{Binding SupportsCompact}" Note="Needs the centered Windows 11 taskbar layout.">
+                    <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding Draft.Compact, Mode=TwoWay}"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Auto-fit width" Badge="REGION" Description="Measures where your icons really are (UI Automation) and follows them as you open and close apps."
+                              IsEnabled="{Binding SupportsCompact}">
+                    <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding Draft.AutoWidth, Mode=TwoWay}"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Fixed width" Badge="REGION" Description="Used when auto-fit is off. Make sure all your icons fit inside - the preview shows the result."
+                              IsEnabled="{Binding Draft.AutoWidth, Converter={StaticResource InverseBool}}">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.WidthPercent, Mode=TwoWay}" Minimum="30" Maximum="100" Tag="%"/>
+                </c:SettingRow>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <c:SettingRow Title="Apply to all monitors" Badge="NATIVE" Description="Also style the taskbars on secondary monitors.">
+                <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding Draft.AllMonitors, Mode=TwoWay}"/>
+            </c:SettingRow>
+        </Border>
+    </StackPanel>
+</UserControl>

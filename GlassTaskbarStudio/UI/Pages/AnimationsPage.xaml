@@ -1,0 +1,25 @@
+<UserControl x:Class="GlassTaskbarStudio.UI.Pages.AnimationsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:GlassTaskbarStudio.UI.Controls">
+    <StackPanel>
+        <TextBlock Text="Animations" Style="{StaticResource H1}" Margin="0,0,0,4"/>
+        <TextBlock Text="Motion that makes switching looks feel alive - kept light on CPU." Style="{StaticResource Body}" Margin="0,0,0,16"/>
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <c:SettingRow Title="Smooth transitions" Badge="APP" Description="Morphs radius, gaps, tint, gloss and shadow when you apply a preset instead of jumping.">
+                    <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding Draft.AnimateTransitions, Mode=TwoWay}"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Transition duration" Badge="APP" IsEnabled="{Binding Draft.AnimateTransitions}">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.TransitionMs, Mode=TwoWay}" Minimum="100" Maximum="1000" Tag="ms"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Light sweep (shimmer)" Badge="OVERLAY" Description="A soft highlight glides across the glass every few seconds. Rendered at 30 fps; leave off on very low-power machines.">
+                    <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding Draft.Shimmer, Mode=TwoWay}"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Interface animations" Badge="APP" Description="Page transitions inside this app.">
+                    <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding UiAnimations, Mode=TwoWay}"/>
+                </c:SettingRow>
+            </StackPanel>
+        </Border>
+        <Border Style="{StaticResource Card}">
+            <TextBlock Style="{StaticResource Body}" Text="Windows does not expose hooks for the taskbar's own icon animations (hover, launch, minimize), so those stay as Windows draws them."/>
+        </Border>
+    </StackPanel>
+</UserControl>

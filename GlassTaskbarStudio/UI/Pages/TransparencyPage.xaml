@@ -1,0 +1,34 @@
+<UserControl x:Class="GlassTaskbarStudio.UI.Pages.TransparencyPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:GlassTaskbarStudio.UI.Controls">
+    <StackPanel>
+        <TextBlock Text="Transparency and Blur" Style="{StaticResource H1}" Margin="0,0,0,4"/>
+        <TextBlock Text="How much of your desktop shines through - and how it is frosted." Style="{StaticResource Body}" Margin="0,0,0,16"/>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <c:SettingRow Title="Material" Badge="NATIVE" Description="Clear = fully transparent, Blur = light frosting, Acrylic = stronger frosting with noise, Opaque = solid color.">
+                    <Border CornerRadius="12" Background="#14FFFFFF" Padding="3" BorderThickness="1" BorderBrush="#18FFFFFF">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Style="{StaticResource Segment}" Content="Clear" IsChecked="{Binding Draft.Material, Converter={StaticResource EnumMatch}, ConverterParameter=Clear}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="Blur" IsChecked="{Binding Draft.Material, Converter={StaticResource EnumMatch}, ConverterParameter=Blur}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="Acrylic" IsChecked="{Binding Draft.Material, Converter={StaticResource EnumMatch}, ConverterParameter=Acrylic}"/>
+                            <RadioButton Style="{StaticResource Segment}" Content="Opaque" IsChecked="{Binding Draft.Material, Converter={StaticResource EnumMatch}, ConverterParameter=Opaque}"/>
+                        </StackPanel>
+                    </Border>
+                </c:SettingRow>
+                <c:SettingRow Title="Transparency" Badge="NATIVE" Description="100% shows only the frosted glass, 0% is fully tinted. Has no effect on Clear and Opaque.">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding Draft.Transparency, Mode=TwoWay}" Tag="%"/>
+                </c:SettingRow>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Text="About blur" Style="{StaticResource H2}"/>
+                <TextBlock Style="{StaticResource Body}" Margin="0,6,0,0"
+                           Text="Windows applies the blur itself and offers no setting for its radius, so there is no blur-strength slider here - a slider that did nothing would be a lie. Blur and Acrylic are the two strengths Windows provides."/>
+                <TextBlock Style="{StaticResource Body}" Margin="0,10,0,0"
+                           Text="On some Windows 11 builds the taskbar keeps a faint system tint of its own on top of the glass. That layer belongs to Windows; Material = Clear and a high Transparency get as close to invisible as Windows allows."/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

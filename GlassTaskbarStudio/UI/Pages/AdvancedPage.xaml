@@ -1,0 +1,53 @@
+<UserControl x:Class="GlassTaskbarStudio.UI.Pages.AdvancedPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:c="clr-namespace:GlassTaskbarStudio.UI.Controls">
+    <StackPanel>
+        <TextBlock Text="Advanced" Style="{StaticResource H1}" Margin="0,0,0,4"/>
+        <TextBlock Text="Startup, safety and a transparent look at how everything works." Style="{StaticResource Body}" Margin="0,0,0,16"/>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <c:SettingRow Title="Start with Windows" Badge="APP" Description="Launches silently in the tray at sign-in and re-applies your look. Stored in your user Run key - no administrator rights.">
+                    <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding StartWithWindows, Mode=TwoWay}"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Hide overlay effects in fullscreen" Badge="OVERLAY" Description="Gloss and shadow disappear while a game or video is fullscreen.">
+                    <ToggleButton Style="{StaticResource ToggleSwitch}" IsChecked="{Binding HideInFullscreen, Mode=TwoWay}"/>
+                </c:SettingRow>
+                <c:SettingRow Title="Re-apply interval" Badge="APP" Description="Explorer occasionally resets its taskbar; this is how often it is re-asserted. Higher = less CPU.">
+                    <Slider Style="{StaticResource GlassSlider}" Value="{Binding RefreshMs, Mode=TwoWay}" Minimum="250" Maximum="5000" Tag="ms"/>
+                </c:SettingRow>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Text="Safety and recovery" Style="{StaticResource H2}"/>
+                <TextBlock Style="{StaticResource Body}" Margin="0,6,0,12" Text="Effects live only while this app runs in the tray; quitting it gives the taskbar back to Windows. Your original icon alignment and size are backed up before the first change."/>
+                <WrapPanel>
+                    <Button Content="Restore Windows taskbar" Style="{StaticResource GlassButton}" Command="{Binding RestoreCommand}" Margin="0,0,10,10"/>
+                    <Button Content="Restart Explorer" Style="{StaticResource GlassButton}" Command="{Binding RestartExplorerCommand}" Margin="0,0,10,10"/>
+                    <Button Content="Open settings folder" Style="{StaticResource GlassButton}" Command="{Binding OpenFolderCommand}" Margin="0,0,10,10"/>
+                </WrapPanel>
+                <TextBlock Style="{StaticResource Caption}" Text="Emergency: run  GlassTaskbarStudio.exe --reset  to remove all effects even if the app is not running."/>
+            </StackPanel>
+        </Border>
+
+        <Border Style="{StaticResource Card}">
+            <StackPanel>
+                <TextBlock Text="How it works - and what is impossible" Style="{StaticResource H2}"/>
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="92"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <Border Margin="0,4,0,10" Background="#FF23A65E" CornerRadius="6" Padding="6,1,6,2" HorizontalAlignment="Left" VerticalAlignment="Top"><TextBlock Text="NATIVE" FontSize="9.5" FontWeight="Bold" Foreground="White"/></Border>
+                    <TextBlock Grid.Column="1" Style="{StaticResource Body}" Margin="0,2,0,10" Text="Material, transparency and tint: the window-composition accent policy that Windows' own UI uses, set on the real taskbar window. Works on Windows 10 and 11, no admin."/>
+                    <Border Grid.Row="1" Margin="0,4,0,10" Background="#FF2F6FE0" CornerRadius="6" Padding="6,1,6,2" HorizontalAlignment="Left" VerticalAlignment="Top"><TextBlock Text="REGION" FontSize="9.5" FontWeight="Bold" Foreground="White"/></Border>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Body}" Margin="0,2,0,10" Text="Rounded corners, floating gaps and compact islands: the taskbar window is clipped to a custom shape (SetWindowRgn). The taskbar still works normally; only its visible area changes."/>
+                    <Border Grid.Row="2" Margin="0,4,0,10" Background="#FF7C4DE0" CornerRadius="6" Padding="6,1,6,2" HorizontalAlignment="Left" VerticalAlignment="Top"><TextBlock Text="OVERLAY" FontSize="9.5" FontWeight="Bold" Foreground="White"/></Border>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource Body}" Margin="0,2,0,10" Text="Gloss, rim light, borders, shadow and shimmer: Windows cannot draw these on its taskbar, so a click-through window sits on top of it. It never takes focus or mouse input."/>
+                    <Border Grid.Row="3" Margin="0,4,0,10" Background="#FFC98410" CornerRadius="6" Padding="6,1,6,2" HorizontalAlignment="Left" VerticalAlignment="Top"><TextBlock Text="REGISTRY" FontSize="9.5" FontWeight="Bold" Foreground="White"/></Border>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Body}" Margin="0,2,0,10" Text="Icon alignment and taskbar size: the Windows 11 Explorer settings in your user registry hive. Original values are backed up and restorable."/>
+                    <Border Grid.Row="4" Margin="0,4,0,0" Background="#FF5B6682" CornerRadius="6" Padding="6,1,6,2" HorizontalAlignment="Left" VerticalAlignment="Top"><TextBlock Text="NOT POSSIBLE" FontSize="9.5" FontWeight="Bold" Foreground="White"/></Border>
+                    <TextBlock Grid.Row="4" Grid.Column="1" Style="{StaticResource Body}" Margin="0,2,0,0" Text="Adjustable blur radius, taskbar on top/left/right on Windows 11, arbitrary taskbar heights, and hooking the taskbar's built-in icon animations - Windows exposes no way to do these to the real taskbar."/>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>
