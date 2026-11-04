@@ -246,7 +246,7 @@ namespace GlassTaskbarStudio.UI.Controls
             {
                 string path = Registry.GetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "WallPaper", null) as string;
                 if (string.IsNullOrEmpty(path) || !File.Exists(path))
-                    path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Microsoft\Windows\Themes\TranscodedWallpaper");
+                    path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"Microsoft\Windows\Themes\TranscodedWallpaper");
                 if (!File.Exists(path)) return null;
                 var bi = new BitmapImage();
                 bi.BeginInit();
