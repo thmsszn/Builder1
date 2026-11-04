@@ -212,7 +212,7 @@ namespace GlassTaskbarStudio.Tests
                 var c = ColorUtil.Parse(hex);
                 ColorUtil.ToHsv(c, out double h, out double s, out double v);
                 var back = ColorUtil.FromHsv(h, s, v);
-                Assert.Equal(c.R, back.R, 1); Assert.Equal(c.G, back.G, 1); Assert.Equal(c.B, back.B, 1);
+                Assert.InRange(Math.Abs(c.R - back.R), 0, 1); Assert.InRange(Math.Abs(c.G - back.G), 0, 1); Assert.InRange(Math.Abs(c.B - back.B), 0, 1);
             }
         }
 
