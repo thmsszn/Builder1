@@ -13,6 +13,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+      - name: Unit tests
+        run: dotnet test GlassTaskbarStudio.Tests/GlassTaskbarStudio.Tests.csproj -c Release --logger "console;verbosity=normal"
       - name: Publish Glass Taskbar Studio
         run: dotnet publish GlassTaskbarStudio/GlassTaskbarStudio.csproj -c Release -o publish/studio
       - name: Publish GlassBar (dock replacement)

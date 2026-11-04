@@ -98,11 +98,13 @@ namespace GlassTaskbarStudio.UI.Controls
             double barTopV = viewH - barH;
             double iconPitch = 44, iconCount = 6; // start + 5 apps
             double groupW = iconPitch * iconCount;
-            double groupX = s.Alignment == IconAlignment.Center ? (VirtualW - groupW) / 2 : 12;
+            bool centered = s.Alignment == IconAlignment.Center || !Capabilities.SupportsAlignment && Capabilities.IsWindows11;
+            if (!Capabilities.SupportsAlignment) centered = false;   // Windows 10: icons are always left-aligned
+            double groupX = centered ? (VirtualW - groupW) / 2 : 12;
             double trayW = 190;
 
             var layout = LayoutCalculator.Compute(s, VirtualW * sc, barH * sc, sc, trayW * sc,
-                                                  new Rect(groupX * sc, 0, groupW * sc, barH * sc), true);
+                                                  new Rect(groupX * sc, 0, groupW * sc, barH * sc), Capabilities.SupportsCompact);
             double barTop = barTopV * sc;
             var pills = new List<Rect>();
             foreach (var p in layout.Pills) pills.Add(new Rect(p.X + rect.X, p.Y + barTop, p.Width, p.Height));
